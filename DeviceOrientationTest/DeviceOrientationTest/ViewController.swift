@@ -12,6 +12,10 @@ import RealityKit
 import MapKit
 import CoreLocation
 
+
+//MARK: Enable this if you don't want AR and Map
+let showARandMapViews = false
+
 class ViewController: UIViewController {
     
     //MARK: Vars
@@ -32,25 +36,28 @@ class ViewController: UIViewController {
     //MARK: ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
-                
-        sceneView = ARView(frame: CGRect(x: 0, y: 0, width: self.arView.frame.width, height: self.arView.frame.height))
-        self.arView.addSubview(sceneView)
         
-        theMapView = MKMapView(frame: CGRect(x: 0, y: 0, width: self.mapView.frame.width, height: self.mapView.frame.height))
-        theMapView.mapType = MKMapType.standard
-        theMapView.isZoomEnabled = true
-        theMapView.isScrollEnabled = true
-        theMapView.center = view.center
-        
-        theMapView.delegate = self
-        theMapView.showsCompass = true
-        theMapView.showsScale = true
-        theMapView.showsTraffic = true
-        
-        mapView.addSubview(theMapView)
-
-        locationManager.delegate = self
-        
+        if showARandMapViews {
+            sceneView = ARView(frame: CGRect(x: 0, y: 0, width: self.arView.frame.width, height: self.arView.frame.height))
+            self.arView.addSubview(sceneView)
+            
+            theMapView = MKMapView(frame: CGRect(x: 0, y: 0, width: self.mapView.frame.width, height: self.mapView.frame.height))
+            theMapView.mapType = MKMapType.standard
+            theMapView.isZoomEnabled = true
+            theMapView.isScrollEnabled = true
+            theMapView.center = view.center
+            
+            theMapView.delegate = self
+            theMapView.showsCompass = true
+            theMapView.showsScale = true
+            theMapView.showsTraffic = true
+            
+            mapView.addSubview(theMapView)
+            
+            locationManager.delegate = self
+            
+            getCurrentLocation()
+        }
         
         if motionManager.isDeviceMotionAvailable {
             
@@ -64,7 +71,7 @@ class ViewController: UIViewController {
                     if !self.switchViewToMap{
                         self.actualViewText = "MAP"
                         self.testLabel.textColor = .black
-                        self.testLabel.backgroundColor = .green
+                        self.testLabel.backgroundColor = .systemGreen
                         self.switchToMapAnim()
                     }
                     self.switchViewToMap = true
@@ -72,7 +79,7 @@ class ViewController: UIViewController {
                     if self.switchViewToMap {
                         self.actualViewText = "AR"
                         self.testLabel.textColor = .white
-                        self.testLabel.backgroundColor = .blue
+                        self.testLabel.backgroundColor = .systemBlue
                         self.switchToARAnim()
                     }
                     self.switchViewToMap = false
@@ -84,7 +91,7 @@ class ViewController: UIViewController {
         }else {
             print("Device motion not available")
         }
-        getCurrentLocation()
+        
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -96,8 +103,8 @@ class ViewController: UIViewController {
         locationManager.requestWhenInUseAuthorization()
         if CLLocationManager.locationServicesEnabled() && locationManager.authorizationStatus == .denied {
             print("Access denied. restart and authorize App")
-                return
-            }
+            return
+        }
         
         if CLLocationManager.locationServicesEnabled() {
             locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
@@ -134,7 +141,9 @@ class ViewController: UIViewController {
     //MARK: Switch To AR
     private func switchToARAnim(){
         DispatchQueue.main.async{
-            self.activateAR()
+            if showARandMapViews {
+                self.activateAR()
+            }
             self.arView.isHidden = false
             UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 5, options: .curveEaseInOut, animations: {
                 self.mapView.alpha = 0
