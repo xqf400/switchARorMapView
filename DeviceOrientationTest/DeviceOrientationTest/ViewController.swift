@@ -10,34 +10,47 @@ import CoreMotion
 import ARKit
 import RealityKit
 import MapKit
+import CoreLocation
 
 class ViewController: UIViewController {
     
+    //MARK: Vars
     @IBOutlet weak var testLabel: UILabel!
     @IBOutlet weak var arView: UIView!
     @IBOutlet weak var mapView: UIView!
     
     var sceneView: ARView!
-    let motionManager = CMMotionManager()
-    var theMapView: MKMapView!
+    let motionManager = CMMotionManager() //device Rotation
+    var theMapView: MKMapView! //Map View
+    let locationManager = CLLocationManager() //Location
+    var currentLocation : CLLocation?   //Location
     
     var switchViewToMap = false
     var actualViewText = ""
     
     
-    //MARK: View Did Load
+    //MARK: ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
                 
-        sceneView = ARView(frame: CGRect(x: 0, y: 0, width: self.arView.frame.width, height: self.arView.frame.height))
-        self.arView.addSubview(sceneView)
+        //sceneView = ARView(frame: CGRect(x: 0, y: 0, width: self.arView.frame.width, height: self.arView.frame.height))
+        //self.arView.addSubview(sceneView)
         
         theMapView = MKMapView(frame: CGRect(x: 0, y: 0, width: self.mapView.frame.width, height: self.mapView.frame.height))
         theMapView.mapType = MKMapType.standard
         theMapView.isZoomEnabled = true
         theMapView.isScrollEnabled = true
         theMapView.center = view.center
+        
+        theMapView.delegate = self
+        theMapView.showsCompass = true
+        theMapView.showsScale = true
+        theMapView.showsTraffic = true
+        
         mapView.addSubview(theMapView)
+
+        locationManager.delegate = self
+        
         
         if motionManager.isDeviceMotionAvailable {
             
@@ -52,7 +65,7 @@ class ViewController: UIViewController {
                         self.actualViewText = "MAP"
                         self.testLabel.textColor = .black
                         self.testLabel.backgroundColor = .green
-                        self.switchToMap()
+                        self.switchToMapAnim()
                     }
                     self.switchViewToMap = true
                 }else{
@@ -60,7 +73,7 @@ class ViewController: UIViewController {
                         self.actualViewText = "AR"
                         self.testLabel.textColor = .white
                         self.testLabel.backgroundColor = .blue
-                        self.switchToAR()
+                        self.switchToARAnim()
                     }
                     self.switchViewToMap = false
                 }
@@ -71,6 +84,7 @@ class ViewController: UIViewController {
         }else {
             print("Device motion not available")
         }
+        getCurrentLocation()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -78,8 +92,30 @@ class ViewController: UIViewController {
         deactivateAR()
     }
     
+    private func getCurrentLocation(){
+        print("test")
+        self.locationManager.requestWhenInUseAuthorization()
+        if CLLocationManager.locationServicesEnabled() {
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            //locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            //locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
+            //locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            //locationManager.activityType = .fitness
+            //locationManager.distanceFilter = 5
+            self.locationManager.startUpdatingLocation()
+        }
+    }
+    
+    //MARK: Activate MAP
     private func activateMap(){
-
+        if let location = currentLocation{
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = location.coordinate
+            self.theMapView.showAnnotations([annotation], animated: true)
+            self.theMapView.selectAnnotation(annotation, animated: true)
+            self.theMapView.showAnnotations([annotation], animated: true)
+            self.theMapView.selectAnnotation(annotation, animated: true)
+        }
     }
     
     //MARK: Activate AR
@@ -97,7 +133,7 @@ class ViewController: UIViewController {
     }
     
     //MARK: Switch To AR
-    private func switchToAR(){
+    private func switchToARAnim(){
         DispatchQueue.main.async{
             self.activateAR()
             self.arView.isHidden = false
@@ -112,7 +148,7 @@ class ViewController: UIViewController {
     }
     
     //MARK: Switch To Map
-    private func switchToMap(){
+    private func switchToMapAnim(){
         DispatchQueue.main.async{
             self.mapView.isHidden = false
             UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 5, options: .curveEaseInOut, animations: {
@@ -127,4 +163,18 @@ class ViewController: UIViewController {
     
     
 }
+
+extension ViewController: MKMapViewDelegate {
+    
+}
+
+extension ViewController: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location: CLLocation = manager.location else { return }
+        currentLocation = location
+        self.locationManager.stopUpdatingLocation()
+        activateMap()
+    }
+}
+
 
