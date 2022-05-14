@@ -94,7 +94,7 @@ class ViewController: UIViewController {
     
     private func getCurrentLocation(){
         locationManager.requestWhenInUseAuthorization()
-        if CLLocationManager.locationServicesEnabled() && CLLocationManager.authorizationStatus() == .denied {
+        if CLLocationManager.locationServicesEnabled() && locationManager.authorizationStatus == .denied {
             print("Access denied. restart and authorize App")
                 return
             }
