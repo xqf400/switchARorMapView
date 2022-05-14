@@ -9,6 +9,7 @@ import UIKit
 import CoreMotion
 import ARKit
 import RealityKit
+import MapKit
 
 class ViewController: UIViewController {
     
@@ -18,8 +19,9 @@ class ViewController: UIViewController {
     
     var sceneView: ARView!
     let motionManager = CMMotionManager()
-    var switchViewToMap = false
+    var theMapView: MKMapView!
     
+    var switchViewToMap = false
     var actualViewText = ""
     
     
@@ -29,6 +31,13 @@ class ViewController: UIViewController {
                 
         sceneView = ARView(frame: CGRect(x: 0, y: 0, width: self.arView.frame.width, height: self.arView.frame.height))
         self.arView.addSubview(sceneView)
+        
+        theMapView = MKMapView(frame: CGRect(x: 0, y: 0, width: self.mapView.frame.width, height: self.mapView.frame.height))
+        theMapView.mapType = MKMapType.standard
+        theMapView.isZoomEnabled = true
+        theMapView.isScrollEnabled = true
+        theMapView.center = view.center
+        mapView.addSubview(theMapView)
         
         if motionManager.isDeviceMotionAvailable {
             
@@ -41,12 +50,16 @@ class ViewController: UIViewController {
                 if angle < 35 {
                     if !self.switchViewToMap{
                         self.actualViewText = "MAP"
+                        self.testLabel.textColor = .black
+                        self.testLabel.backgroundColor = .green
                         self.switchToMap()
                     }
                     self.switchViewToMap = true
                 }else{
                     if self.switchViewToMap {
                         self.actualViewText = "AR"
+                        self.testLabel.textColor = .white
+                        self.testLabel.backgroundColor = .blue
                         self.switchToAR()
                     }
                     self.switchViewToMap = false
@@ -63,6 +76,10 @@ class ViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         deactivateAR()
+    }
+    
+    private func activateMap(){
+
     }
     
     //MARK: Activate AR
