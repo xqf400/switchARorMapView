@@ -17,6 +17,8 @@ class ViewController: UIViewController {
     let motionManager = CMMotionManager()
     var switchViewToMap = false
     
+    var actualViewText = ""
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -30,19 +32,19 @@ class ViewController: UIViewController {
                 let angle = manager.attitude.pitch * 180 / Double.pi
                 if angle < 35 {
                     if !self.switchViewToMap{
-                        print("Map \(angle)")
+                        self.actualViewText = "MAP"
                         self.switchToMap()
                     }
                     self.switchViewToMap = true
                 }else{
                     if self.switchViewToMap {
-                        print("AR \(angle)")
+                        self.actualViewText = "AR"
                         self.switchToAR()
                     }
                     self.switchViewToMap = false
                 }
                 DispatchQueue.main.async{
-                    self.testLabel.text = "Angle: \(angle)"
+                    self.testLabel.text = String(format: "\(self.actualViewText) %.2f ", angle)
                 }
                 
             }
