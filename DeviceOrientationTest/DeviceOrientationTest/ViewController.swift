@@ -56,7 +56,7 @@ class ViewController: UIViewController {
             theMapView.showsTraffic = true
             theMapView.showsCompass = false
             
-            //compass own compass
+            //own compass
             compassIcon = MKCompassButton(mapView: theMapView)
             compassIcon.translatesAutoresizingMaskIntoConstraints = false
             compassIcon.compassVisibility = .visible
@@ -64,7 +64,7 @@ class ViewController: UIViewController {
             self.view.addSubview(compassIcon)
             
             compassIcon.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -40).isActive = true
-            compassIcon.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 80).isActive = true
+            compassIcon.topAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -80).isActive = true
             
             mapView.addSubview(theMapView)
             
