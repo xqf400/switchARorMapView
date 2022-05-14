@@ -27,7 +27,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
                 
-        sceneView = ARView(frame: self.arView.frame)
+        sceneView = ARView(frame: CGRect(x: 0, y: 0, width: self.arView.frame.width, height: self.arView.frame.height))
         self.arView.addSubview(sceneView)
         
         if motionManager.isDeviceMotionAvailable {
