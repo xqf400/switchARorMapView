@@ -14,7 +14,7 @@ import CoreLocation
 
 
 //MARK: Enable this if you don't want AR and Map
-let showARandMapViews = false
+let showARandMapViews = true
 
 class ViewController: UIViewController {
     
