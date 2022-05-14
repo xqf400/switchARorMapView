@@ -27,7 +27,9 @@ class ViewController: UIViewController {
     let motionManager = CMMotionManager() //device Rotation
     var theMapView: MKMapView! //Map View
     let locationManager = CLLocationManager() //Location
-    var currentLocation : CLLocation?   //Location
+    var currentLocation: CLLocation?   //Location
+    
+    var compassButton:MKCompassButton!
     
     var switchViewToMap = false
     var actualViewText = ""
@@ -48,9 +50,20 @@ class ViewController: UIViewController {
             theMapView.center = view.center
             
             theMapView.delegate = self
-            theMapView.showsCompass = true
             theMapView.showsScale = true
             theMapView.showsTraffic = true
+            
+            
+            theMapView.showsCompass = false
+
+            compassButton = MKCompassButton(mapView: theMapView)
+            compassButton.compassVisibility = .visible
+
+            theMapView.addSubview(compassButton)
+
+            compassButton.translatesAutoresizingMaskIntoConstraints = false
+            compassButton.trailingAnchor.constraint(equalTo: theMapView.trailingAnchor, constant: -40).isActive = true
+            compassButton.topAnchor.constraint(equalTo: theMapView.topAnchor, constant: 40).isActive = true
             
             mapView.addSubview(theMapView)
             
