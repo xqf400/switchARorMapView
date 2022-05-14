@@ -22,17 +22,13 @@ class ViewController: UIViewController {
     
     var actualViewText = ""
     
-    let arConfig = ARWorldTrackingConfiguration()
     
     //MARK: View Did Load
     override func viewDidLoad() {
         super.viewDidLoad()
                 
-        arConfig.isAutoFocusEnabled = true
-        arConfig.isLightEstimationEnabled = true
         sceneView = ARView(frame: self.arView.frame)
-        //sceneView.session.delegate = self
-        self.arView.insertSubview(sceneView, at: 0)
+        self.arView.addSubview(sceneView)
         
         if motionManager.isDeviceMotionAvailable {
             
@@ -58,12 +54,10 @@ class ViewController: UIViewController {
                 DispatchQueue.main.async{
                     self.testLabel.text = String(format: "\(self.actualViewText) %.2f ", angle)
                 }
-                
             }
         }else {
             print("Device motion not available")
         }
-        
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -73,19 +67,16 @@ class ViewController: UIViewController {
     
     //MARK: Activate AR
     private func activateAR(){
-        //if let configuration = sceneView.session.configuration {
-            sceneView.session.run(arConfig, options: [.resetTracking, .resetSceneReconstruction, .removeExistingAnchors])
-        //}
+        if let configuration = sceneView.session.configuration {
+            sceneView.session.run(configuration, options: [.resetTracking, .resetSceneReconstruction, .removeExistingAnchors])
+        }
     }
     
     //MARK: Deactivate AR
     private func deactivateAR(){
         if self.sceneView != nil {
             self.sceneView.session.pause()
-            //self.sceneView.removeFromSuperview()
-            //self.sceneView = ARView()
         }
-
     }
     
     //MARK: Switch To AR
@@ -95,15 +86,11 @@ class ViewController: UIViewController {
             self.arView.isHidden = false
             UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 5, options: .curveEaseInOut, animations: {
                 self.mapView.alpha = 0
-                self.mapView.transform = self.mapView.transform.scaledBy(x: 1.1, y: 1.1)
-                
                 self.arView.alpha = 1
-                self.arView.transform = self.arView.transform.scaledBy(x: 1.3, y: 1.3)
                 
             }) { _ in
                 self.mapView.isHidden = true
             }
-            
         }
     }
     
@@ -113,15 +100,11 @@ class ViewController: UIViewController {
             self.mapView.isHidden = false
             UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 5, options: .curveEaseInOut, animations: {
                 self.arView.alpha = 0
-                self.arView.transform = self.arView.transform.scaledBy(x: 1.1, y: 1.1)
-                
                 self.mapView.alpha = 1
-                self.mapView.transform = self.mapView.transform.scaledBy(x: 1.3, y: 1.3)
             }) { _ in
                 self.arView.isHidden = true
                 self.deactivateAR()
             }
-            
         }
     }
     
