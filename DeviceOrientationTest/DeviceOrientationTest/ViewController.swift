@@ -61,10 +61,10 @@ class ViewController: UIViewController {
             compassIcon.translatesAutoresizingMaskIntoConstraints = false
             compassIcon.compassVisibility = .visible
 
-            theMapView.addSubview(compassIcon)
+            self.view.addSubview(compassIcon)
             
-            compassIcon.trailingAnchor.constraint(equalTo: theMapView.trailingAnchor, constant: -40).isActive = true
-            compassIcon.topAnchor.constraint(equalTo: theMapView.topAnchor, constant: 40).isActive = true
+            compassIcon.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -40).isActive = true
+            compassIcon.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 80).isActive = true
             
             mapView.addSubview(theMapView)
             
