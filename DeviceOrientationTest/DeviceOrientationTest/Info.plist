@@ -3,11 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Location2</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Location</string>
-	<key>NSLocationUsageDescription</key>
-	<string>Location1</string>
+	<string>Need for Location</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Needed for AR</string>
 	<key>UIApplicationSceneManifest</key>

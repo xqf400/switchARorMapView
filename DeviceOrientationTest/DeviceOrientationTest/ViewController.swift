@@ -33,8 +33,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
                 
-        //sceneView = ARView(frame: CGRect(x: 0, y: 0, width: self.arView.frame.width, height: self.arView.frame.height))
-        //self.arView.addSubview(sceneView)
+        sceneView = ARView(frame: CGRect(x: 0, y: 0, width: self.arView.frame.width, height: self.arView.frame.height))
+        self.arView.addSubview(sceneView)
         
         theMapView = MKMapView(frame: CGRect(x: 0, y: 0, width: self.mapView.frame.width, height: self.mapView.frame.height))
         theMapView.mapType = MKMapType.standard
@@ -93,16 +93,15 @@ class ViewController: UIViewController {
     }
     
     private func getCurrentLocation(){
-        print("test")
-        self.locationManager.requestWhenInUseAuthorization()
+        locationManager.requestWhenInUseAuthorization()
+        if CLLocationManager.locationServicesEnabled() && CLLocationManager.authorizationStatus() == .denied {
+            print("Access denied. restart and authorize App")
+                return
+            }
+        
         if CLLocationManager.locationServicesEnabled() {
             locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
-            //locationManager.desiredAccuracy = kCLLocationAccuracyBest
-            //locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
-            //locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
-            //locationManager.activityType = .fitness
-            //locationManager.distanceFilter = 5
-            self.locationManager.startUpdatingLocation()
+            locationManager.startUpdatingLocation()
         }
     }
     
