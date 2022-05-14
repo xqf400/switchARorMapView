@@ -139,23 +139,24 @@ class ViewController: UIViewController {
     //MARK: Activate AR
     private func activateAR(){
         if let configuration = sceneView.session.configuration {
-            sceneView.session.run(configuration, options: [.resetTracking, .resetSceneReconstruction, .removeExistingAnchors])
+            sceneView.session.run(configuration, options: [])
         }
     }
     
     //MARK: Deactivate AR
     private func deactivateAR(){
         if self.sceneView != nil {
-            self.sceneView.session.pause()
+            //Better for saving battery to pause the session
+            //self.sceneView.session.pause()
         }
     }
     
     //MARK: Switch To AR
     private func switchToARAnim(){
+        if showARandMapViews {
+            self.activateAR()
+        }
         DispatchQueue.main.async{
-            if showARandMapViews {
-                self.activateAR()
-            }
             self.arView.isHidden = false
             UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 5, options: .curveEaseInOut, animations: {
                 self.mapView.alpha = 0
