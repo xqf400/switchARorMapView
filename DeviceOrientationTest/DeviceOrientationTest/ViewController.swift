@@ -7,6 +7,8 @@
 
 import UIKit
 import CoreMotion
+import ARKit
+import RealityKit
 
 class ViewController: UIViewController {
     
@@ -14,13 +16,23 @@ class ViewController: UIViewController {
     @IBOutlet weak var arView: UIView!
     @IBOutlet weak var mapView: UIView!
     
+    var sceneView: ARView!
     let motionManager = CMMotionManager()
     var switchViewToMap = false
     
     var actualViewText = ""
     
+    let arConfig = ARWorldTrackingConfiguration()
+    
+    //MARK: View Did Load
     override func viewDidLoad() {
         super.viewDidLoad()
+                
+        arConfig.isAutoFocusEnabled = true
+        arConfig.isLightEstimationEnabled = true
+        sceneView = ARView(frame: self.arView.frame)
+        //sceneView.session.delegate = self
+        self.arView.insertSubview(sceneView, at: 0)
         
         if motionManager.isDeviceMotionAvailable {
             
@@ -49,14 +61,37 @@ class ViewController: UIViewController {
                 
             }
         }else {
-            print("Device motion unavailable")
+            print("Device motion not available")
         }
         
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        deactivateAR()
+    }
+    
+    //MARK: Activate AR
+    private func activateAR(){
+        //if let configuration = sceneView.session.configuration {
+            sceneView.session.run(arConfig, options: [.resetTracking, .resetSceneReconstruction, .removeExistingAnchors])
+        //}
+    }
+    
+    //MARK: Deactivate AR
+    private func deactivateAR(){
+        if self.sceneView != nil {
+            self.sceneView.session.pause()
+            //self.sceneView.removeFromSuperview()
+            //self.sceneView = ARView()
+        }
+
     }
     
     //MARK: Switch To AR
     private func switchToAR(){
         DispatchQueue.main.async{
+            self.activateAR()
             self.arView.isHidden = false
             UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 5, options: .curveEaseInOut, animations: {
                 self.mapView.alpha = 0
@@ -64,7 +99,7 @@ class ViewController: UIViewController {
                 
                 self.arView.alpha = 1
                 self.arView.transform = self.arView.transform.scaledBy(x: 1.3, y: 1.3)
-
+                
             }) { _ in
                 self.mapView.isHidden = true
             }
@@ -82,9 +117,9 @@ class ViewController: UIViewController {
                 
                 self.mapView.alpha = 1
                 self.mapView.transform = self.mapView.transform.scaledBy(x: 1.3, y: 1.3)
-
             }) { _ in
                 self.arView.isHidden = true
+                self.deactivateAR()
             }
             
         }
