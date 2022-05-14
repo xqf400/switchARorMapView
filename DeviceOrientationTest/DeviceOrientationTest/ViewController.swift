@@ -29,7 +29,7 @@ class ViewController: UIViewController {
     let locationManager = CLLocationManager() //Location
     var currentLocation: CLLocation?   //Location
     
-    var compassButton:MKCompassButton!
+    var compassIcon: MKCompassButton!
     
     var switchViewToMap = false
     var actualViewText = ""
@@ -43,6 +43,8 @@ class ViewController: UIViewController {
             sceneView = ARView(frame: CGRect(x: 0, y: 0, width: self.arView.frame.width, height: self.arView.frame.height))
             self.arView.addSubview(sceneView)
             
+            locationManager.delegate = self
+
             theMapView = MKMapView(frame: CGRect(x: 0, y: 0, width: self.mapView.frame.width, height: self.mapView.frame.height))
             theMapView.mapType = MKMapType.standard
             theMapView.isZoomEnabled = true
@@ -52,22 +54,19 @@ class ViewController: UIViewController {
             theMapView.delegate = self
             theMapView.showsScale = true
             theMapView.showsTraffic = true
-            
-            
             theMapView.showsCompass = false
+            
+            //compass own compass
+            compassIcon = MKCompassButton(mapView: theMapView)
+            compassIcon.translatesAutoresizingMaskIntoConstraints = false
+            compassIcon.compassVisibility = .visible
 
-            compassButton = MKCompassButton(mapView: theMapView)
-            compassButton.compassVisibility = .visible
-
-            theMapView.addSubview(compassButton)
-
-            compassButton.translatesAutoresizingMaskIntoConstraints = false
-            compassButton.trailingAnchor.constraint(equalTo: theMapView.trailingAnchor, constant: -40).isActive = true
-            compassButton.topAnchor.constraint(equalTo: theMapView.topAnchor, constant: 40).isActive = true
+            theMapView.addSubview(compassIcon)
+            
+            compassIcon.trailingAnchor.constraint(equalTo: theMapView.trailingAnchor, constant: -40).isActive = true
+            compassIcon.topAnchor.constraint(equalTo: theMapView.topAnchor, constant: 40).isActive = true
             
             mapView.addSubview(theMapView)
-            
-            locationManager.delegate = self
             
             getCurrentLocation()
         }
@@ -125,8 +124,8 @@ class ViewController: UIViewController {
         }
     }
     
-    //MARK: Activate MAP
-    private func activateMap(){
+    //MARK: Place Pin on Current Location (not used)
+    private func placePinOnCurrentLocation(){
         if let location = currentLocation{
             let annotation = MKPointAnnotation()
             annotation.coordinate = location.coordinate
@@ -194,7 +193,19 @@ extension ViewController: CLLocationManagerDelegate {
         guard let location: CLLocation = manager.location else { return }
         currentLocation = location
         self.locationManager.stopUpdatingLocation()
-        activateMap()
+        //placePinOnCurrentLocation()
+    }
+    
+    //MARK: This is for rotating the map and the compass
+    func mapViewDidFinishLoadingMap(_ mapView: MKMapView) {
+        theMapView.setUserTrackingMode(.followWithHeading, animated: false)
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+        if(CLLocationCoordinate2DIsValid(theMapView.centerCoordinate))
+        {
+            theMapView.camera.heading = newHeading.trueHeading
+        }
     }
 }
 
